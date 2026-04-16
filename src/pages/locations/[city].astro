@@ -1,15 +1,11 @@
 ---
 import '../../styles/global.css';
+import neighborhoods from '../../cities.json';
 
 export function getStaticPaths() {
-  const cities = [
-    'brandon', 'riverview', 'valrico', 'lithia', 'gibsonton', 'apollo-beach', 'tampa', 'plant-city', 'seffner', 'ruskin'
-  ];
-  return cities.map(c => ({
-    params: { city: c },
-    props: { 
-      cityName: c.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-    }
+  return neighborhoods.map(c => ({
+    params: { city: c.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') },
+    props: { cityName: c }
   }));
 }
 
