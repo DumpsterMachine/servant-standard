@@ -62,55 +62,43 @@ const { cityName } = Astro.props;
   
 
 
-<style is:global>
-  .fade-up {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .fade-up.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-</style>
+
+
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Grab all major headings, paragraphs, and cards outside the hero and header
-    const elements = document.querySelectorAll('section:not(:first-of-type) h2, section:not(:first-of-type) h3, section:not(:first-of-type) p, section:not(:first-of-type) .group, section:not(:first-of-type) a, section:not(:first-of-type) button');
+    const headings = document.querySelectorAll('main section:not(:first-of-type) h2, main section:not(:first-of-type) h3, main section:not(:first-of-type) h4');
+    const paragraphs = document.querySelectorAll('main section:not(:first-of-type) p');
+    const cards = document.querySelectorAll('main section:not(:first-of-type) .group');
+    const buttons = document.querySelectorAll('main section:not(:first-of-type) button, main section:not(:first-of-type) a.bg-\\[\\#c9a84c\\]');
     
-    elements.forEach((el, i) => {
-      if(el.closest('header') || el.closest('.marquee-track')) return;
-      el.classList.add('fade-up');
-      // Add a slight stagger delay for cards
-      if(el.classList.contains('group')) {
-        el.style.transitionDelay = `${(i % 3) * 0.15}s`;
-      }
+    // Apply standard fade up to text
+    [...headings, ...paragraphs, ...buttons].forEach(el => {
+      if(el.closest('header') || el.closest('.marquee-track') || el.closest('section.relative.h-\\[100svh\\]')) return;
+      el.setAttribute('data-aos', 'fade-up');
+      el.setAttribute('data-aos-duration', '800');
     });
 
-    const observer = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          obs.unobserve(entry.target);
-        }
-      });
-    }, { rootMargin: '0px 0px -50px 0px', threshold: 0.1 });
+    // Apply staggered fade up to grid cards
+    cards.forEach((el, index) => {
+      if(el.closest('header') || el.closest('.marquee-track')) return;
+      el.setAttribute('data-aos', 'fade-up');
+      el.setAttribute('data-aos-duration', '800');
+      // Delay columns in rows of 3 (0ms, 150ms, 300ms)
+      el.setAttribute('data-aos-delay', String((index % 3) * 150));
+    });
 
-    // Give it a tiny tick for the browser to render the initial hidden state before observing
-    setTimeout(() => {
-      document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-      
-      // Force reveal anything already in the viewport on load
-      document.querySelectorAll('.fade-up').forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if(rect.top < window.innerHeight) {
-          el.classList.add('visible');
-        }
-      });
-    }, 50);
+    // Initialize Animate On Scroll
+    AOS.init({
+      once: true,
+      offset: 40,
+      easing: 'ease-out-cubic'
+    });
   });
 </script>
 </body>
+
 
 
 </html>
